@@ -20,6 +20,12 @@ int main() {
    // Write a for loop that initialises each struct's resultA and resultB with ascending integers.
    // Verify the output of the program before and after you do this.
 
+   for (int i = 0; i < 10; ++i) {
+       collection[i].resultA = i;
+       collection[i].resultB = i * 2;
+   }
+   // Було:  resultA = 0    resultB = 0
+   // Стало: resultA = 45    resultB = 90
 
    // Task 2:
    // We use a range-based for loop to analyse the array of structs.
@@ -28,8 +34,9 @@ int main() {
    // Hint: Fix the type declaration "auto" in the loop head.
    int resultA = 0;
    int resultB = 0;
-   for (auto item : collection) {
-      resultA += item.resultA;
+//   for (auto& item : collection) {  //   Замість копіювання використовуємо посилання: додаємо &
+   for (auto const & item : collection) { // Змінна item у циклі не змінюється (тільки читається), тому можна використовувати const
+      resultA += item.resultA;     
       resultB += item.resultB;
    }
    std::cout << "resultA = " << resultA << "\tresultB = " << resultB << "\n";
