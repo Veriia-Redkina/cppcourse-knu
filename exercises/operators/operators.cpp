@@ -4,11 +4,50 @@
 
 class Fraction {
  public:
-  // TODO: constructors and operators
+// constructors 
+Fraction(int num, int denom) : m_num(num), m_denom(denom) { //Конструктор, що приймає чисельник і знаменник
+  normalize();
+}
+explicit Fraction(int i) : m_num(i), m_denom(1) {}          //Конструктор, що приймає тільки ціле число
+
+// operators  
+ // Оператор виведення
+friend std::ostream& operator<<(std::ostream& os, Fraction const & f) {
+  os << f.m_num << "/" << f.m_denom;
+  return os;
+}
+ // Оператори множення
+Fraction & operator*=(int i) {
+  m_num *= i;
+  normalize();
+  return *this;
+} 
+Fraction & operator*=(Fraction const & o) {
+  m_num *= o.m_num;
+  m_denom *= o.m_denom;
+  normalize();
+  return *this;
+}
+friend Fraction operator*(Fraction f, int i) { return f *= i; }
+friend Fraction operator*(int i, Fraction const & f) { return f * i; }
+friend Fraction operator*(Fraction a, Fraction const & b) { return a *= b; }
+
+ // Оператори порівняння
+friend bool operator==(Fraction const & a, Fraction const & b) {
+  return a.m_num == b.m_num && a.m_denom == b.m_denom;
+}
+friend bool operator!=(Fraction const & a, Fraction const & b) { return !(a == b); }
+friend bool operator<(Fraction const & a, Fraction const & b) {
+  return a.m_num * b.m_denom < b.m_num * a.m_denom;
+}
+friend bool operator>(Fraction const & a, Fraction const & b) { return b < a; }
+friend bool operator<=(Fraction const & a, Fraction const & b) { return !(a > b); }
+friend bool operator>=(Fraction const & a, Fraction const & b) { return !(a < b); }
+
 
  private:
   void normalize() {
-    const int gcd = std::gcd(m_num, m_denom);
+    auto const gcd = std::gcd(m_num, m_denom); //компілятор автоматично визначає тип змінної gcd залежно від типу, який повертає функція std::gcd
     m_num /= gcd;
     m_denom /= gcd;
   }
@@ -17,7 +56,6 @@ class Fraction {
 };
 
 // TODO: operators
-
 
 void printAndCheck(std::string const & what, Fraction const & result, Fraction const & expected) {
   const bool passed = result == expected;
