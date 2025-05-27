@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <array>
-
+#include <memory>
 
 /* --------------------------------------------------------------------------------------------
  * Unique ownership.
@@ -53,9 +53,9 @@ void doStuff() {
 
     // MAKE YOUR CHANGES IN THIS FUNCTION
 
-    auto obj = new LargeObject ;
+    std::unique_ptr<LargeObject> obj = std::make_unique<LargeObject>();
     changeLargeObject(*obj) ;
-    delete obj ;
+    
 
 }
 
@@ -70,3 +70,11 @@ int main() {
     std::cout<<"Leaked large objects: "<<LargeObject::count<<std::endl ;
 
 }
+/*
+Було:
+Terminated with exception: Error when changing object data.
+Leaked large objects: 1
+Стало:
+Terminated with exception: Error when changing object data.
+Leaked large objects: 0
+*/

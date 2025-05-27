@@ -5,7 +5,7 @@
 #include <vector>
 #include <random>
 #include <algorithm>
-
+#include <memory>
 
 /* --------------------------------------------------------------------------------------------
  * Shared ownership.
@@ -49,7 +49,8 @@ struct LargeObject {
 // in a random place. Such elements can by known in
 // several vectors, so they must not be deleted.
 
-void removeRandom( std::vector<LargeObject *> & collection, std::default_random_engine & engine ) {
+void removeRandom(std::vector<std::shared_ptr<LargeObject>>& collection, std::default_random_engine & engine ) {
+
 
     // MAKE YOUR CHANGES IN THIS FUNCTION
 
@@ -70,7 +71,7 @@ void changeLargeObject( LargeObject & object ) {
 
 // Global stuff: we have pointers to objects duplicated in two different collections.
 // We work a bit with the collections, and then we try to clean up  without neither
-// memory leak nor segmentation fault. Without a shared ownership model, this becomes a mess.
+// memory leak nor segmentation fault. Without a shared o%wnership model, this becomes a mess.
 
 void doStuff() {
 
@@ -83,9 +84,9 @@ void doStuff() {
 
     // Original collection
 
-    std::vector<LargeObject*> objVector(10);
+    std::vector<std::shared_ptr<LargeObject>> objVector(10);
     for ( auto & ptr : objVector ) {
-        ptr = new LargeObject();
+        ptr = std::make_shared<LargeObject>();
     }
 
     // Let's copy the whole collection
@@ -98,22 +99,14 @@ void doStuff() {
     removeRandom(objVectorCopy,engine);
     removeRandom(objVectorCopy,engine);
     // ...
-    for (auto objPtr : objVector ) {
+    for (auto const & objPtr : objVector ) {
         changeLargeObject(*objPtr) ;
     }
 
     // ONCE YOU FIXED CODE ABOVE WITH SHARED POINTERS
     // THE UGLY CODE BELOW SHOULD BECOME UNNECESSARY
 
-    for ( auto objPtr : objVector ) {
-        delete objPtr ;
-    }
-    for ( auto objPtr : objVectorCopy ) {
-        // If the element is in the original collection, it was already deleted.
-        if (std::find(objVector.begin(), objVector.end(), objPtr) == objVector.end()) {
-            delete objPtr;
-        }
-    }
+
 
 }
 
@@ -123,3 +116,8 @@ int main() {
     std::cout<<"Leaked large objects: "<<LargeObject::count<<std::endl ;
 
 }
+
+/*
+Стало:
+Leaked large objects: 0
+*/
