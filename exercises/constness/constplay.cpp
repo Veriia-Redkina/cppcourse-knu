@@ -24,7 +24,7 @@ void read(const int* a) {
     [[maybe_unused]] int val = *a;
 }
 void read(int const & a) {
-    [[maybe_unused]] int val = a = 2;
+//    [[maybe_unused]] int val = a; // (= a = 2) змінюється const посилання!
 }
 
 struct Test {
@@ -40,18 +40,18 @@ int main() {
     // try pointer to constant
     int a = 1, b = 2;
     int const *i = &a;
-    *i = 5;
+    // *i = 5;                    // не змінюється значення через pointer to const
     i = &b;
 
     // try constant pointer
     int * const j = &a;
     *j = 5;
-    j = &b;
+    // j = &b;                   // не можна переназначити constant pointer
 
     // try constant pointer to constant
     int const * const k = &a;
-    *k = 5;
-    k = &b;
+    // *k = 5;                  // const value — не можна змінювати
+    // k = &b;                  // const pointer — не можна переназначити
 
     // try constant arguments of functions
     int l = 0;
@@ -66,7 +66,7 @@ int main() {
       int *p = &a;
       const int *r = &b;
       write(p);
-      write(r);
+      // write(r);              // неможна передати const int* в функцію write(int*)
       read(p);
       read(r);
     }
@@ -75,8 +75,8 @@ int main() {
     {
       int p = 0;
       const int r = 0;
-      write(2);
-      write(r);
+      // write(2);              // не можна передати як не const reference
+      // write(r);              // не можна передати const int в функцію, що вимагає int&
       read(2);
       read(r);
     }
@@ -86,9 +86,18 @@ int main() {
     const Test tc;
     std::string s("World");
     t.hello(s);
-    tc.hello(s);
+    // tc.hello(s);  //hello не є const-методом
     t.helloConst(s);
     tc.helloConst(s);
 
     return 0;
 }
+
+/*
+В результаті при кумпіляції та запуску маємо:
+valeriia@valeriia-HP:~/5k/OOP/cppcourse-knu/exercises/constness$ g++ -g -o constness constplay.cpp
+valeriia@valeriia-HP:~/5k/OOP/cppcourse-knu/exercises/constness$ ./constness
+Hello World
+Hello World
+Hello World
+*/
